@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,26 +14,77 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        currentState = GameState.Playing;
+        ChangeState(GameState.Playing);
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            PauseGame();
+            if (currentState == GameState.Playing)
+            {
+                PauseGame();
+            }
+            else if (currentState == GameState.Paused)
+            {
+                ResumeGame();
+            }
+        }
+    }
+
+    public void ChangeState(GameState newState)
+    {
+        currentState = newState;
+
+        switch (newState)
+        {
+            case GameState.MainMenu:
+                Time.timeScale = 0f;
+                break;
+
+            case GameState.Playing:
+                Time.timeScale = 1f;
+                break;
+
+            case GameState.Paused:
+                Time.timeScale = 0f;
+                break;
+
+            case GameState.GameOver:
+                Time.timeScale = 0f;
+                break;
         }
     }
 
     public void PauseGame()
     {
-        Time.timeScale = 0f;
-        currentState = GameState.Paused;
+        ChangeState(GameState.Paused);
+        Debug.Log("Game Paused");
+    }
+
+    public void ResumeGame()
+    {
+        ChangeState(GameState.Playing);
+        Debug.Log("Game Resumed");
     }
 
     public void GameOver()
     {
+        ChangeState(GameState.GameOver);
         Debug.Log("Game Over");
-        currentState = GameState.GameOver;
+    }
+
+    public void RestartGame()
+    {
+        Time.timeScale = 1f;
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void BackToMenu()
+    {
+        Time.timeScale = 1f;
+
+        SceneManager.LoadScene("MainMenu");
     }
 }
