@@ -7,14 +7,28 @@ public class GameManager : MonoBehaviour
 
     public GameState currentState;
 
+    [Header("UI Panel")]
+    [SerializeField] private GameObject pausePanel;
+    [SerializeField] private GameObject gameOverPanel;
+
     void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     void Start()
     {
         ChangeState(GameState.Playing);
+
+        pausePanel.SetActive(false);
+        gameOverPanel.SetActive(false);
     }
 
     void Update()
@@ -38,20 +52,23 @@ public class GameManager : MonoBehaviour
 
         switch (newState)
         {
-            case GameState.MainMenu:
-                Time.timeScale = 0f;
-                break;
-
             case GameState.Playing:
                 Time.timeScale = 1f;
+
+                pausePanel.SetActive(false);
+                gameOverPanel.SetActive(false);
                 break;
 
             case GameState.Paused:
                 Time.timeScale = 0f;
+
+                pausePanel.SetActive(true);
                 break;
 
             case GameState.GameOver:
                 Time.timeScale = 0f;
+
+                gameOverPanel.SetActive(true);
                 break;
         }
     }
@@ -59,26 +76,25 @@ public class GameManager : MonoBehaviour
     public void PauseGame()
     {
         ChangeState(GameState.Paused);
-        Debug.Log("Game Paused");
     }
 
     public void ResumeGame()
     {
         ChangeState(GameState.Playing);
-        Debug.Log("Game Resumed");
     }
 
     public void GameOver()
     {
         ChangeState(GameState.GameOver);
-        Debug.Log("Game Over");
     }
 
     public void RestartGame()
     {
         Time.timeScale = 1f;
 
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene(
+            SceneManager.GetActiveScene().buildIndex
+        );
     }
 
     public void BackToMenu()
